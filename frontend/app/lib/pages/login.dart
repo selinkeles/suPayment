@@ -10,6 +10,37 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  var connector = WalletConnect(
+      bridge: 'https://bridge.walletconnect.org',
+      clientMeta: const PeerMeta(
+          name: 'SuPayment',
+          description: 'An app for a new payment.',
+          url: 'https://walletconnect.org'
+          //icons: [
+          //  'https://files.gitbook.com/v0/b/gitbook-legacy-files/o/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media'
+          //]
+          ));
+
+  var _uri, _session;
+
+  loginUsingMetamask(BuildContext context) async {
+    if (!connector.connected) {
+      try {
+        var session = await connector.createSession(onDisplayUri: (uri) async {
+          _uri = uri;
+          await launchUrlString(uri, mode: LaunchMode.externalApplication);
+        });
+        print(session.accounts[0]);
+        print(session.chainId);
+        setState(() {
+          _session = session;
+        });
+      } catch (exp) {
+        print(exp);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +56,8 @@ class _LoginPageState extends State<LoginPage> {
             //  fit: BoxFit.fitHeight,
             // ),
             ElevatedButton(
-                onPressed: () => {}, child: const Text("Connect with Metamask"))
+                onPressed: () => loginUsingMetamask(context),
+                child: const Text("Connect with Metamask"))
           ],
         ),
       ),
