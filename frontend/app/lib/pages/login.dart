@@ -43,6 +43,25 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    connector.on(
+        'connect',
+        (session) => setState(
+              () {
+                _session = _session;
+              },
+            ));
+    connector.on(
+        'session_update',
+        (payload) => setState(() {
+              _session = payload;
+              print(_session.accounts[0]);
+              print(_session.chainId);
+            }));
+    connector.on(
+        'disconnect',
+        (payload) => setState(() {
+              _session = null;
+            }));
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login Page'),
