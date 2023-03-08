@@ -1,4 +1,8 @@
+import 'package:app/pages/transaction_pages/main_page.dart';
+import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:app/pages/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +16,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/welcome': (context) => const WelcomePage(),
+        // '/home': (context) => const HomeScreen(),
+      },
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -24,7 +34,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MainPage(),//const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -49,6 +59,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _connected = "not connected";
 
   void _incrementCounter() {
     setState(() {
@@ -58,6 +69,22 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+    });
+  }
+
+  void _connectBackend() async {
+    var url = Uri.parse('http://127.0.0.1:8000/');
+    var response = await http.get(url);
+    // parse response
+    String responseBody;
+    if (response.statusCode == 200) {
+      responseBody = "helalke";
+    } else {
+      responseBody = 'Request failed with status: ${response.statusCode}.';
+    }
+
+    setState(() {
+      _connected = responseBody;
     });
   }
 
@@ -95,6 +122,13 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(
+              'connected: $_connected',
+            ),
+            ElevatedButton(
+              onPressed: _connectBackend,
+              child: const Text('Connect to backend'),
+            ),
             const Text(
               'You have pushed the button this many times:',
             ),
