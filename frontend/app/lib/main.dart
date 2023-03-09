@@ -1,3 +1,4 @@
+import 'package:app/pages/SUlogin_page.dart';
 import 'package:app/pages/transaction_pages/main_page.dart';
 import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +17,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: '/login',
+      initialRoute: '/welcome',
       routes: {
         '/login': (context) => const LoginPage(),
         '/welcome': (context) => const WelcomePage(),
+        '/main' : (context) => const MainPage(),
+        '/sulogin': (context) => const suloginPage(),
         // '/home': (context) => const HomeScreen(),
       },
       theme: ThemeData(

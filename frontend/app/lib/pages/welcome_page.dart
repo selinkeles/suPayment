@@ -1,4 +1,6 @@
 import 'package:app/misc/colors.dart';
+import 'package:app/pages/SUlogin_page.dart';
+import 'package:app/pages/transaction_pages/main_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:app/widgets/app_text.dart';
 import 'package:app/widgets/responsive_button.dart';
@@ -73,7 +75,22 @@ class _WelcomePageState extends State<WelcomePage> {
                         ),
                       ),
                       SizedBox(height: 40,),
-                      ResponsiveButton(width: 120,),
+                      OutlinedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                                  (Set<MaterialState> states) {
+                                return AppColors.mainColor;
+                              },
+                            ),
+                          ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const suloginPage()),
+                          );
+                        },
+                          child: ResponsiveButton(width: 120,)
+                      ),
 
                     ],
                   ),
