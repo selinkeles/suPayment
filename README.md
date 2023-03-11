@@ -1,11 +1,10 @@
 # SUPayment
 
-#  TODO
+##  TODO
 
-- yagiz: 
+- yagiz:
   - endpoints for server
   - schema for endpoints
-
 
 - berke:
   - main page ilk acılcak sayfa
@@ -17,14 +16,14 @@
   - event listener > recent transactions sayfası
   - balance gostergesi > blockchainden alınacak (allowances in contract)
 
-# Installation
+## Installation
 
 - go into blockchain > 'run npm install'
 - go into server > 'npm install'
 - go into frontend/app > 'flutter pub get'
 - Android studio > Emulator with playstore > install MetaMask
 
-#  Run
+##  Run
 
 - go into server > 'npm run dev'
 - open Metamask in emulator
