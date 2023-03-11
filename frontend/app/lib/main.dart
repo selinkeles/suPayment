@@ -1,3 +1,7 @@
+import 'package:app/pages/SUlogin_page.dart';
+import 'package:app/pages/profile_page.dart';
+import 'package:app/pages/transaction_pages/main_page.dart';
+import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/pages/login.dart';
@@ -14,9 +18,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: '/login',
+      initialRoute: '/welcome',
       routes: {
         '/login': (context) => const LoginPage(),
+        '/welcome': (context) => const WelcomePage(),
+        '/main' : (context) => const MainPage(),
+        '/sulogin': (context) => const suloginPage(),
+        '/profile' : (context) => const profilePage(),
         // '/home': (context) => const HomeScreen(),
       },
       theme: ThemeData(
@@ -31,7 +39,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MainPage(),//const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
