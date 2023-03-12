@@ -1,10 +1,9 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-import dotenv from 'dotenv'
-import { ethers } from "hardhat";
+import dotenv from 'dotenv';
 
-dotenv.config()
-const { API_KEY, API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env
+dotenv.config({ path: '../.env'});
+const { API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   // solidity config
@@ -22,8 +21,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     goerli: {
-      url: `${API_URL}${API_KEY}`,
-      accounts: [PRIVATE_KEY??'']
+      url: `${API_URL}`,
+      accounts: [`0x${PRIVATE_KEY}`]
     }
   },
   etherscan: {

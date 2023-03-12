@@ -2,22 +2,13 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-async function main() {
-    /*
-    const user = await prisma.user.create({
-        data: {
-            name: "ykc",
-            email: "ykc@prisma.io",
-        },
-    })
-    console.log(user)
-    */
+async function addToDB() {
 
     const allUsers = await prisma.user.findMany()
     console.log(allUsers)
 }
 
-main()
+addToDB()
   .then(async () => {
     await prisma.$disconnect()
   })
@@ -26,3 +17,4 @@ main()
     await prisma.$disconnect()
     process.exit(1)
   })
+
