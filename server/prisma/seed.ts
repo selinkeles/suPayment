@@ -4,17 +4,34 @@ const prisma = new PrismaClient()
 
 const userData: Prisma.UserCreateInput[] = [
   {
-    name: 'Alice',
-    email: 'alice@prisma.io',
+    name: 'Kamer Kaya',
+    email: 'kamer.kaya@sabanciuniv.edu',
   },
   {
-    name: 'Nilu',
-    email: 'nilu@prisma.io',
+    name: 'Husnu Yenigun',
+    email: 'husnuyenigun@sabanciuniv.edu',
   },
   {
-    name: 'Mahmoud',
-    email: 'mahmoud@prisma.io',
+    name: 'Erkay Savas',
+    email: 'esavas@sabanciuniv.edu',
   },
+  {
+    name: 'Aydin Deniz Atalay',
+    email: 'datalay@sabanciuniv.edu',
+  },
+  {
+    name: 'Mustafa Yagiz Kilicarslan',
+    email: 'ykilicarslan@sabanciuniv.edu',
+  },
+  {
+    name: 'Osman Berke Yildirim',
+    email: 'oberke@sabanciuniv.edu',
+  },
+  {
+    name: 'Selin Keles',
+    email: 'selinkeles@sabanciuniv.edu',
+  },
+
 ]
 
 async function main() {

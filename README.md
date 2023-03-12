@@ -5,6 +5,7 @@
 - yagiz:
   - endpoints for server
   - schema for endpoints
+  - server/index/ > connect.ts'i middleware olarak kullan
 
 - berke:
   - main page ilk acılcak sayfa

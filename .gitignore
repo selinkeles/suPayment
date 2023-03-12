@@ -1,4 +1,7 @@
 /blockchain/node_modules/
+/blockchain/artifacts/
+/blockchain/cache/
+/blockchain/typechain-types/
 /server/node_modules/
 /blockchain/typechain-types
 /blockchain/artifacts
