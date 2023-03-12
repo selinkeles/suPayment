@@ -12,7 +12,6 @@
   - profil sayfası (connect to sulogin butonu dahil)
 
 - deniz:
-  - qr generator for transfer and receive
   - event listener > recent transactions sayfası
   - balance gostergesi > blockchainden alınacak (allowances in contract)
 
