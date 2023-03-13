@@ -56,6 +56,8 @@ class _HomePageState extends State<HomePage> {
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        title: AppLargeText(text: "SUpayment",color: AppColors.mainColor,size: 27),
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
@@ -65,6 +67,7 @@ class _HomePageState extends State<HomePage> {
             );
           },
           icon: CircleAvatar(
+                radius: 17,
                 backgroundColor: AppColors.starColor,
                 backgroundImage: const AssetImage("assets/images/avatar.jpeg"),
               ),
@@ -89,12 +92,13 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Center(child: AppText(text: "Connect to Metamask", color: Colors.white,))),
                 ),
+               SizedBox(height: 10,),
                Divider(
                 color: AppColors.textColor2,
                 thickness: 1,
                  height: 1,
               ),
-              const SizedBox(height: 30,),
+              const SizedBox(height: 15,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Container(
@@ -117,13 +121,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Divider(
                 color: AppColors.textColor2,
                 thickness: 1,
                 height: 1,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -132,9 +136,13 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 15),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Container(
-                  height: height * .50,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.mainColor, width: 5),
+                    borderRadius: BorderRadius.circular(12)
+                  ),
+                  height: height * .53,
                   child: ListView.separated(
                       itemCount: entries.length,
                     padding: const EdgeInsets.all(2),
@@ -153,6 +161,7 @@ class _HomePageState extends State<HomePage> {
               ),
                 ),
               ),
+
             ],
           ),
         ),

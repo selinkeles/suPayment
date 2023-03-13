@@ -4,62 +4,60 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+
 class TransferPage extends StatefulWidget {
+  const TransferPage({Key? key}) : super(key: key);
+
   @override
-  _TransferPageState createState() => _TransferPageState();
+  State<TransferPage> createState() => _TransferPageState();
 }
 
 class _TransferPageState extends State<TransferPage> {
-  TextEditingController _amountController = TextEditingController();
-  String _qrData = '';
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.mainColor,
-      ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(backgroundColor:AppColors.mainColor),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Enter Amount',
-                  border: OutlineInputBorder(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            children: [
+              const SizedBox(height: 10,),
+              SizedBox(
+                width: 280,
+                height: 150,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppLargeText(text: "Amount:", size: 20),
+                       TextField(
+                         decoration: customInputDecoration("Please enter your amount"),
+                       ),
+
+                    ]
                 ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _qrData = _amountController.text;
-                });
-              },
-              child: Text('Generate QR Code'),
-            ),
-            if (_qrData.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: QrImage(
-                  data: _qrData,
-                  version: QrVersions.auto,
-                  size: 200.0,
-                ),
-              ),
-          ],
+
+
+            ],
+          ),
         ),
       ),
     );
   }
+
+  InputDecoration customInputDecoration(String hintText) {
+    return InputDecoration(
+        hintText: hintText,
+        enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: AppColors.mainColor)
+        ),
+        focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+                color: AppColors.mainColor
+            )
+        ),
+    );
+        }
 }

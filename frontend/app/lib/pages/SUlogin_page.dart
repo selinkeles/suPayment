@@ -17,6 +17,16 @@ class _suloginPageState extends State<suloginPage> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar:AppBar(
+      backgroundColor: Colors.white,
+      leading: IconButton(
+        color: AppColors.buttonBackground,
+          icon: const Icon(Icons.arrow_back_ios_new_sharp),
+          onPressed: () {
+            Navigator.pop(context);
+          }
+      ),
+    ),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

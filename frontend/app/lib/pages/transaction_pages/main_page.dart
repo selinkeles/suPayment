@@ -15,9 +15,9 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   List pages = [
     const HomePage(),
-    BuyPage(),
+    const BuyPage(),
     const SellPage(),
-    TransferPage()
+    const TransferPage()
   ];
   int currentIndex=0;
   void onTap(int index){

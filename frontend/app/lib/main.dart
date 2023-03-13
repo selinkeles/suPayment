@@ -10,18 +10,24 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var count = 0;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: '/welcome',
+      initialRoute: count==0?'/welcome':'/main',
       routes: {
         '/login': (context) => const LoginPage(),
-        '/welcome': (context) => const WelcomePage(),
+        '/welcome': (context) => WelcomePage(),
         '/main' : (context) => const MainPage(),
         '/sulogin': (context) => const suloginPage(),
         '/profile' : (context) => const profilePage(),
