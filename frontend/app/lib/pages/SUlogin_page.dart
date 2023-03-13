@@ -17,6 +17,16 @@ class _suloginPageState extends State<suloginPage> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar:AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            color: AppColors.buttonBackground,
+            icon: const Icon(Icons.arrow_back_ios_new_sharp),
+            onPressed: () {
+              Navigator.pop(context);
+            }
+        ),
+      ),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,10 +35,10 @@ class _suloginPageState extends State<suloginPage> {
             Container(
               height: height *.23,
               decoration: const BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                    image: AssetImage("assets/images/sabanci.png")
-                )
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage("assets/images/sabanci.png")
+                  )
               ),
             ),
             Padding(
@@ -55,16 +65,16 @@ class _suloginPageState extends State<suloginPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const MainPage()),
+                          MaterialPageRoute(builder: (context) =>  MainPage()),
                         );
                       },
                       child: Container(
-                        height: 50,
+                          height: 50,
                           width: 150,
                           margin: EdgeInsets.symmetric(horizontal: 60),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            color: AppColors.buttonBackground
+                              borderRadius: BorderRadius.circular(50),
+                              color: AppColors.buttonBackground
                           ),
                           child: Center(child: AppText(text: "Login", color: Colors.white,))),
                     ),
@@ -87,15 +97,16 @@ class _suloginPageState extends State<suloginPage> {
 
   InputDecoration customInputDecoration(String hintText) {
     return InputDecoration(
-                    hintText: hintText,
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.mainColor)
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.mainColor
-                      )
-                    )
-                  );
+        hintText: hintText,
+        enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: AppColors.mainColor)
+        ),
+        focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+                color: AppColors.mainColor
+            )
+        )
+    );
   }
 }
+

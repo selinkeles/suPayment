@@ -1,3 +1,4 @@
+import 'package:app/misc/wallet.dart';
 import 'package:app/pages/SUlogin_page.dart';
 import 'package:app/pages/profile_page.dart';
 import 'package:app/pages/transaction_pages/main_page.dart';
@@ -5,26 +6,38 @@ import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/pages/login.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => WalletProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var count = 0;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: '/welcome',
+      initialRoute: count == 0 ? '/welcome' : '/main',
       routes: {
         '/login': (context) => const LoginPage(),
-        '/welcome': (context) => const WelcomePage(),
-        '/main' : (context) => const MainPage(),
+        '/welcome': (context) => WelcomePage(),
+        '/main': (context) => MainPage(),
         '/sulogin': (context) => const suloginPage(),
-        '/profile' : (context) => const profilePage(),
+        '/profile': (context) => const profilePage(),
         // '/home': (context) => const HomeScreen(),
       },
       theme: ThemeData(
@@ -39,7 +52,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(),//const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MainPage(), //const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

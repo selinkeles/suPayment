@@ -6,15 +6,17 @@ import 'package:app/pages/transaction_pages/transfer_page.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  var _walletid;
+  MainPage({Key? key}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
+
   List pages = [
-    const HomePage(),
+    HomePage(),
     BuyPage(),
     const SellPage(),
     TransferPage()
