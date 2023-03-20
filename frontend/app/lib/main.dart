@@ -1,5 +1,6 @@
 import 'package:app/misc/wallet.dart';
 import 'package:app/pages/SUlogin_page.dart';
+import 'package:app/pages/signup_page.dart';
 import 'package:app/pages/home_page.dart';
 import 'package:app/pages/profile_page.dart';
 import 'package:app/pages/transaction_pages/main_page.dart';
@@ -39,6 +40,7 @@ class _MyAppState extends State<MyApp> {
         MyRoutes.welcomeRoute: (context) => const WelcomePage(),
         MyRoutes.suloginRoute: (context) => const suloginPage(),
         MyRoutes.profileRoute: (context) => const ProfilePage(),
+        MyRoutes.susignupRoute: (context) => const SignupPage(),
       },
       theme: ThemeData(
         // This is the theme of your application.

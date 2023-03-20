@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-class Wallet {
+class Wallett {
   final String wallet_id;
 
-  Wallet({
+  Wallett({
    required this.wallet_id
 });
 
 }
 
 class WalletProvider with ChangeNotifier {
-  Wallet? _wallet;
+  Wallett? _wallet;
 
-  Wallet? get wallet => _wallet;
+  Wallett? get wallet => _wallet;
 
-  void setWallet(Wallet newWallet) {
+  void setWallet(Wallett newWallet) {
     _wallet = newWallet;
     notifyListeners();
     }

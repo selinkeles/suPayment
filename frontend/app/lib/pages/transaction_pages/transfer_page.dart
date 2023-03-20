@@ -36,7 +36,7 @@ class _TransferPageState extends State<TransferPage> {
     final walletProvider = Provider.of<WalletProvider>(context);
 
     if (walletProvider.wallet != null) {
-      Wallet wallet = walletProvider.wallet!;
+      Wallett wallet = walletProvider.wallet!;
     }
     var height = MediaQuery.of(context).size.height;
     return DefaultTabController(

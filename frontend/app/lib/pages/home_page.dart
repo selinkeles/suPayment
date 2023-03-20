@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:app/utils/constants.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:app/UI/colors.dart';
@@ -7,10 +6,13 @@ import 'package:app/pages/profile_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:app/widgets/app_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wallet_connect/wallet_connect.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:web3dart/web3dart.dart';
+
+import '../misc/wallet.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -31,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   var _uri, _session, account, _signature, chainId;
 
   var accountBalance = 0.0;
+  var _wallet_id;
 
   signMessageWithMetamask(BuildContext context, String message) async {
     if (connector.connected) {
@@ -55,6 +58,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
+ 
 
   /*
   Future<String> signMsgWithMetamask(String message) async {
@@ -109,11 +113,22 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _session = session;
           account = session.accounts[0];
+          _setWallet(context,session.accounts[0]);
         });
       } catch (exp) {
         // print(exp);
       }
     }
+  }
+
+  void _setWallet(BuildContext context, String id) {
+    final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+
+    Wallett wallet = Wallett(
+      wallet_id: id,
+    );
+
+    walletProvider.setWallet(wallet);
   }
 
   List entries = [
