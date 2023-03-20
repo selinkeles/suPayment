@@ -11,7 +11,9 @@ import 'package:wallet_connect/wallet_connect.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:web3dart/web3dart.dart';
-
+import '../misc/webSocket.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../misc/wallet.dart';
 
 class HomePage extends StatefulWidget {
@@ -58,23 +60,19 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
- 
 
   /*
   Future<String> signMsgWithMetamask(String message) async {
     final client = WCClient();
-
     final response = await client.request({
       "method": "personal_sign",
       "params": [message, from],
       "id": DateTime.now().millisecondsSinceEpoch,
     });
     
-
     if (response.containsKey("error")) {
       throw Exception(response["error"]["message"]);
     }
-
     final signature = response["result"] as String;
     return signature;
   }
@@ -103,6 +101,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void listenTx(String address) async {
+    var client = http.Client();
+    try {
+      var response = await client.post(
+        Uri.parse("http://10.0.2.2:3000/subscribe"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{'addr': address}),
+      );
+      var decResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+      var uri = Uri.parse(decResponse['uri'] as String);
+      print(await client.get(uri));
+    } finally {
+      client.close();
+    }
+  }
+
   loginUsingMetamask(BuildContext context) async {
     if (!connector.connected) {
       try {
@@ -110,10 +126,11 @@ class _HomePageState extends State<HomePage> {
           _uri = uri;
           await launchUrlString(uri, mode: LaunchMode.externalApplication);
         });
+        listenTx(session.accounts[0]);
         setState(() {
           _session = session;
           account = session.accounts[0];
-          _setWallet(context,session.accounts[0]);
+          _setWallet(context, session.accounts[0]);
         });
       } catch (exp) {
         // print(exp);
