@@ -1,5 +1,0 @@
-// Webhook
-
-export function wh () {
-    
-}

@@ -7,9 +7,10 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// create a User Table to store the user information
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
   name  String?
+  addr  String?
 }
-
