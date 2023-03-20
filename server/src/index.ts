@@ -6,6 +6,8 @@ import { connectToRPC } from "./connectToAlchemy";
 
 
 
+
+
 // Express app  
 const app = express()
 app.use(express.json()) // ?
@@ -34,13 +36,18 @@ app.post(`/subscribe`, async (req, res) => {
 
 app.post("/alchemyhook", (req, res) => {
   console.log("notification received!");
-  io.emit("notification", JSON.stringify(req.body)); // will be cached by client
-  res.status(200).end();
+  //JSON.stringify(req.body)
+  io.emit("notification", "hehe" ); // will be cached by client
+  // res.status(200).end();
 })
 
 // WS Endpoints
 io.on('connection', (socket) => {
   console.log('client connected');
+  // socket.emit() to the cliet
+  socket.emit('someevent', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
+  socket.on("ahoy", (d) => console.log(d));
+  socket.emit("hel", {"ho": "bo"});
   socket.on('disconnect', () => console.log('client disconneted'));
 });
 

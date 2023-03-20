@@ -1,5 +1,5 @@
 import 'package:app/pages/home_page.dart';
-import 'package:app/misc/colors.dart';
+import 'package:app/UI/colors.dart';
 import 'package:app/pages/transaction_pages/buy_page.dart';
 import 'package:app/pages/transaction_pages/sell_page.dart';
 import 'package:app/pages/transaction_pages/transfer_page.dart';
@@ -14,20 +14,14 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
-  List pages = [
-    HomePage(),
-    BuyPage(),
-    const SellPage(),
-    TransferPage()
-  ];
-  int currentIndex=0;
-  void onTap(int index){
+  List pages = [HomePage(), BuyPage(), const SellPage(), TransferPage()];
+  int currentIndex = 0;
+  void onTap(int index) {
     setState(() {
       currentIndex = index;
     });
-
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,14 +38,13 @@ class _MainPageState extends State<MainPage> {
         showSelectedLabels: true,
         elevation: 0,
         items: [
-          BottomNavigationBarItem(label: "Home",
-              icon: Icon(Icons.apps_rounded)),
-          BottomNavigationBarItem(label: "Buy",
-              icon: Icon(Icons.payments_sharp)),
-          BottomNavigationBarItem(label: "Sell",
-              icon: Icon(Icons.payments_outlined)),
-          BottomNavigationBarItem(label: "Transfer",
-              icon: Icon(Icons.qr_code))
+          BottomNavigationBarItem(
+              label: "Home", icon: Icon(Icons.apps_rounded)),
+          BottomNavigationBarItem(
+              label: "Buy", icon: Icon(Icons.payments_sharp)),
+          BottomNavigationBarItem(
+              label: "Sell", icon: Icon(Icons.payments_outlined)),
+          BottomNavigationBarItem(label: "Transfer", icon: Icon(Icons.qr_code))
         ],
       ),
     );

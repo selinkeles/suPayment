@@ -1,5 +1,4 @@
-import 'package:app/misc/colors.dart';
-import 'package:app/pages/SUlogin_page.dart';
+import 'package:app/UI/colors.dart';
 import 'package:app/pages/transaction_pages/main_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:app/widgets/app_text.dart';
@@ -7,7 +6,7 @@ import 'package:app/widgets/responsive_button.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
-  WelcomePage({Key? key}) : super(key: key);
+  const WelcomePage({Key? key}) : super(key: key);
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
@@ -20,21 +19,13 @@ class _WelcomePageState extends State<WelcomePage> {
     "welcome_page_3.png"
   ];
 
-  List largeTexts = [
-    "Connect",
-    "Pay by",
-    "Use"
-  ];
+  List largeTexts = ["SU Wallet", "Pay by", "Use"];
 
-  List subTexts = [
-    "to Metamask",
-    "SUcoin",
-    "at campus"
-  ];
+  List subTexts = ["Web3 of Sabanci University", "SUcoin", "at campus"];
 
   List descriptions = [
-    "Connect to your Metamask wallet and access your cryptocurrencies easily from our app to make transactions.",
-    "Make transactions by the unique cryptocurrency of Sabancı University via your Metamask account and SUpayment app.",
+    "1. Connect to your favorite crypto wallet\n2. Link your SU account if desired\n3. ..that's it really, Enjoy!",
+    "Make transactions by the unique cryptocurrency of Sabanci University via your Metamask account and SUpayment app.",
     "Use the app in every enterprise in campus. Cafeteria, Piazza, Fasshane, PizzaBulls etc. Basically EVERYWHERE!"
   ];
 
@@ -50,12 +41,8 @@ class _WelcomePageState extends State<WelcomePage> {
               height: double.maxFinite,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage(
-                          "assets/images/" + images[index]
-                      ),
-                      fit: BoxFit.cover
-                  )
-              ),
+                      image: AssetImage("assets/images/" + images[index]),
+                      fit: BoxFit.cover)),
               child: Container(
                 margin: const EdgeInsets.only(top: 150, left: 20, right: 20),
                 child: Row(
@@ -65,9 +52,11 @@ class _WelcomePageState extends State<WelcomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppLargeText(text: largeTexts[index]),
-                        AppText(text: subTexts[index], size: 30),
-                        SizedBox(height: 20,),
-                        Container(
+                        AppText(text: subTexts[index], size: 28),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
                           width: 250,
                           child: AppText(
                             text: descriptions[index],
@@ -75,12 +64,14 @@ class _WelcomePageState extends State<WelcomePage> {
                             size: 14,
                           ),
                         ),
-                        SizedBox(height: 40,),
+                        const SizedBox(
+                          height: 40,
+                        ),
                         OutlinedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty
-                                  .resolveWith<Color?>(
-                                    (Set<MaterialState> states) {
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
                                   return AppColors.mainColor;
                                 },
                               ),
@@ -89,12 +80,12 @@ class _WelcomePageState extends State<WelcomePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>  MainPage()),
+                                    builder: (context) => MainPage()),
                               );
                             },
-                            child: ResponsiveButton(width: 120,)
-                        ),
-
+                            child: ResponsiveButton(
+                              width: 120,
+                            )),
                       ],
                     ),
                     Column(
@@ -107,8 +98,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               borderRadius: BorderRadius.circular(8),
                               color: index == indexDots
                                   ? AppColors.mainColor
-                                  : AppColors.mainColor.withOpacity(0.4)
-                          ),
+                                  : AppColors.mainColor.withOpacity(0.4)),
                         );
                       }),
                     )
@@ -120,5 +110,3 @@ class _WelcomePageState extends State<WelcomePage> {
     );
   }
 }
-
-
