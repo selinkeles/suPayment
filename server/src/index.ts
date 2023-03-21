@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 import { connectToRPC } from "./connectToAlchemy";
 import { WebhookType, Network } from 'alchemy-sdk';
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 const prisma = new PrismaClient()
 
 
@@ -32,7 +32,7 @@ app.get(`/`, (req, res) => {
   console.log("hello world");
 })
 
-// selin
+// selin oki
 app.post(`/link`, async (req, res) => {
   console.log("oldu");
   console.log("body: ", req.body);
@@ -41,12 +41,18 @@ app.post(`/link`, async (req, res) => {
   console.log("email: ", email);
   console.log("addr: ", wallet);
 
-  // create a new user with email and addr=wallet
+  const user = await prisma.user.create({
+    data: {
+      email: email,
+      addr: wallet,
+    },
+  })
+  console.log(user);
   
-  res.json({ message: `your req.body: ${wallet}, ${email}` });
+  res.json(user);
 });
 
-// deniz
+// deniz oki
 app.post(`/subscribe`, async (req, res) => {
   console.log("oldu");
   console.log("body: ", req.body);
@@ -62,7 +68,18 @@ app.post(`/subscribe`, async (req, res) => {
   res.json({ message: `your req.body: ${address}` });
 });
 
+// for mail -> addr mapping oki
+app.get(`/knownusers`, async (req, res) => {
+  console.log("knownusers oldu");
 
+  const all_users = await prisma.user.findMany();
+  console.log("all_users: ", all_users);
+
+  res.send( all_users );
+});
+
+
+// oki
 app.post("/webhook", (req, res) => {
   console.log("notification received!");
   console.log("body: ", req.body);
@@ -82,6 +99,7 @@ app.post("/webhook", (req, res) => {
     "value": value,
     "asset": asset,
   }
+  // stringify the notification
   const notif_message = JSON.stringify(notif);
 
   // TODO: indexer - save tx to db for later retrieval
@@ -91,7 +109,7 @@ app.post("/webhook", (req, res) => {
 
 
 
-// WS Endpoints
+// oki
 io.on('connection', (socket) => {
   console.log(`client connected`);
 

@@ -156,6 +156,15 @@ class _HomePageState extends State<HomePage> {
     "Transaction E"
   ];
 
+  void getKnownUsers() async {
+    var url = "https://b959-159-20-68-5.eu.ngrok.io";
+    var endpoint = "/knownusers";
+    var uri = Uri.parse(url + endpoint);
+
+    var res = await http.get(uri);
+    print("resalute" + res.body);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -234,6 +243,11 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                  onPressed: getKnownUsers, child: const Text('get users')),
               const SizedBox(
                 height: 10,
               ),
