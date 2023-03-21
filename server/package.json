@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "devTS": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon -x src/index.ts"
   },
   "dependencies": {
     "@prisma/client": "4.11.0",

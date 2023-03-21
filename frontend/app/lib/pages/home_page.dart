@@ -11,7 +11,7 @@ import 'package:wallet_connect/wallet_connect.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:web3dart/web3dart.dart';
-import '../misc/webSocket.dart';
+//import '../misc/webSocket.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../misc/wallet.dart';
@@ -160,17 +160,16 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     // SocketService().connected();
-    const ws_url = "https://365e-159-20-68-5.eu.ngrok.io";
+    const ws_url = "https://b959-159-20-68-5.eu.ngrok.io";
     IO.Socket socket =
         IO.io(ws_url, IO.OptionBuilder().setTransports(["websocket"]).build());
 
     socket.onConnect((_) {
       print("connect");
-      socket.emit("ahoy", "dinamik");
-      socket.on("notification", (data) => print("geh"));
+      socket.emit("client-event", "test");
+      socket.on("server-event", (data) => print("server-event: $data"));
+      socket.on("notification", (data) => print("notif received: $data"));
     });
-    socket.on("hel", (data) => print(data));
-    socket.on("someevent", (data) => print(data));
 
     super.initState();
   }

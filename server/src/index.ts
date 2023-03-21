@@ -11,8 +11,8 @@ const prisma = new PrismaClient()
 
 const PORT = 3000;
 
-const webhook_id = "wh_1384qod48mj9dl0c";
-const server_url = "https://6af0-159-20-68-5.eu.ngrok.io";
+const webhook_id = "wh_7r2u4rtc7lgwu2y1";
+const server_url = "https://b959-159-20-68-5.eu.ngrok.io";
 
 // Express app  
 const app = express()
@@ -23,7 +23,7 @@ const server = createServer(app);
 const io = new Server(server);
 
 // RPC Connection 
-const {alchemy, wallet, contract } = connectToRPC();
+const { alchemy, wallet, contract } = connectToRPC();
 
 
 // HTTP Endpoints
@@ -42,17 +42,16 @@ app.post(`/link`, async (req, res) => {
   console.log("addr: ", wallet);
 
   // create a new user with email and addr=wallet
-  //...
-
   
+  res.json({ message: `your req.body: ${wallet}, ${email}` });
 });
 
 // deniz
 app.post(`/subscribe`, async (req, res) => {
-  const body = JSON.parse(req.body);
-  console.log("body: ", body);
+  console.log("oldu");
+  console.log("body: ", req.body);
 
-  const { address } = body;
+  const { address } = req.body;
   console.log("addr: ", address);
   
   await alchemy.notify.updateWebhook(
@@ -60,27 +59,45 @@ app.post(`/subscribe`, async (req, res) => {
     addAddresses: [address]
   });
 
-  res.status(200).end();
+  res.json({ message: `your req.body: ${address}` });
 });
 
-// 
-app.post("/alchemyhook", (req, res) => {
-  console.log("notification received!");
 
-  io.emit("notification", req.body); // will be cached by client
+app.post("/webhook", (req, res) => {
+  console.log("notification received!");
+  console.log("body: ", req.body);
+
+  const { webhookId, id, createdAt, type, event } = req.body;
+  console.log("webhookId: ", webhookId, "id: ", id, "createdAt: ", createdAt, "type: ", type, "event: ", event);
+
+  const { network, activity } = event;
+  console.log("network: ", network, "activity: ", activity);
+
+  const {fromAddress, toAddress, value, asset} = activity[0];
+  console.log("fromAddress: ", fromAddress, "toAddress: ", toAddress, "value: ", value, "asset: ", asset);
+
+  const notif = {
+    "toAddress": toAddress,
+    "fromAddress": fromAddress,
+    "value": value,
+    "asset": asset,
+  }
+  const notif_message = JSON.stringify(notif);
+
+  // TODO: indexer - save tx to db for later retrieval
+  io.emit("notification", notif_message); // will be cached by client
   res.status(200).end();
 })
 
 
+
 // WS Endpoints
 io.on('connection', (socket) => {
-  console.log(`client connected: ${socket.id}`);
+  console.log(`client connected`);
 
-  socket.on("subscribe", (d) => { d.addr  });
-  socket.emit('tx', { tx_id: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
-  socket.emit('someevent', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
-  socket.on("ahoy", (d) => console.log(d));
-  socket.emit("hel", {"ho": "bo"});
+  socket.on("client-event", (d) => { console.log(d) });
+  socket.emit('server-event', { tx_id: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
+
   socket.on('disconnect', () => console.log('client disconneted'));
 
 });

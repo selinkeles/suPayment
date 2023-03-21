@@ -6,7 +6,7 @@ const API_KEY = "WT9iIsSG05wOTKJWBoGGC9O6ky24UKf7";
 const PRIVATE_KEY = "dfb496222786b753eab820acc09d453e06313530e1e03546aa5c49ffcfbd1dcd";
 const CONTRACT_ADDRESS = "0x0c46900947843203f0805763dCFAA3A2bC60f145";
 const WS_API_URL = "wss://eth-goerli.g.alchemy.com/v2/WT9iIsSG05wOTKJWBoGGC9O6ky24UKf7";
-const WH_ID = "wh_k3obqec3wgywmmte";
+const WH_ID = "wh_7r2u4rtc7lgwu2y1";
 const WH_AUTH_TOKEN = "_RXj2lZRspHAbBU74dHqDv0khzi1xNvA";
 const abi = ABI.abi;
 
