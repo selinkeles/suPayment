@@ -136,9 +136,20 @@ class _TransferPageState extends State<TransferPage> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _qrData = _amountController.text +
+                              if (walletProvider.wallet?.wallet_id != null) {
+                                _qrData = _amountController.text +
                                   "|" +
                                   walletProvider.wallet!.wallet_id;
+                              }
+                              else {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: AppText(
+                                  text: "You must connect with metamask first!",
+                                  color: Colors.white,
+                                ),
+                                duration: const Duration(seconds: 1),
+                              ));
+                              }
                               print(_qrData);
                             });
                           },
@@ -188,7 +199,17 @@ class _TransferPageState extends State<TransferPage> {
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
-                              _startScan();
+                              if (walletProvider.wallet?.wallet_id != null) {
+                                _startScan();
+                              }
+                              else {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: AppText(
+                                    text: "You must connect with metamask first!",
+                                    color: Colors.white,
+                                  ),
+                                  duration: const Duration(seconds: 1),));
+                              }  
                             },
                             child: Icon(Icons.camera_alt_rounded),
                             style: ElevatedButton.styleFrom(
