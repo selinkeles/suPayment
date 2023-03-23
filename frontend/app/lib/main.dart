@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
         MyRoutes.homeRoute: (context) => HomePage(),
         MyRoutes.welcomeRoute: (context) => const WelcomePage(),
         MyRoutes.suloginRoute: (context) => const suloginPage(),
-        MyRoutes.profileRoute: (context) => const ProfilePage(),
+        MyRoutes.profileRoute: (context) => ProfilePage(),
         MyRoutes.susignupRoute: (context) => const SignupPage(),
       },
       theme: ThemeData(
