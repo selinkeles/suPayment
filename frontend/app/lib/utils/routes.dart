@@ -5,4 +5,5 @@ class MyRoutes {
   static String accountRoute = '/account';
   static String suloginRoute = '/sulogin';
   static String susignupRoute = '/susignup';
+  static String editRoute = '/edit';
 }

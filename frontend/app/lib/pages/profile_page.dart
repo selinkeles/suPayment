@@ -1,5 +1,6 @@
 import 'package:app/UI/colors.dart';
 import 'package:app/pages/SUlogin_page.dart';
+import 'package:app/pages/edit_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,19 +27,47 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
+       appBar: AppBar(
         centerTitle: true,
-        title: AppLargeText(
-          text: "Profile",
-          size: 25,
-          color: Colors.white70,
+        title: Text(
+          "Profile",
+          style: TextStyle(
+            fontSize: 25,
+            color: Colors.white70,
+          ),
         ),
         backgroundColor: AppColors.mainColor,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_sharp),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
+          icon: Icon(Icons.arrow_back_ios_new_sharp),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          Center(
+            child: Container(
+              child: AppText(text: "Edit",color: Colors.white70,),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: InkWell(
+              splashColor: AppColors.mainColor,
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EditPage()),
+                  );
+              },
+              child: Icon(
+                Icons.edit,
+                size: 25,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
