@@ -74,7 +74,7 @@ app.get(`/knownusers`, async (req, res) => {
 
   const all_users = await prisma.user.findMany();
   console.log("all_users: ", all_users);
-
+  
   res.send( all_users );
 });
 

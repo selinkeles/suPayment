@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:app/utils/constants.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'dart:convert';
 import 'package:app/UI/colors.dart';
 import 'package:app/pages/profile_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:app/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet_connect/wallet_connect.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -148,13 +150,7 @@ class _HomePageState extends State<HomePage> {
     walletProvider.setWallet(wallet);
   }
 
-  List entries = [
-    "Transaction A",
-    "Transaction B",
-    "Transaction C",
-    "Transaction D",
-    "Transaction E"
-  ];
+  List entries = ["Transaction A", "Transaction B"];
 
   void getKnownUsers() async {
     var url = "https://b959-159-20-68-5.eu.ngrok.io";
@@ -163,13 +159,49 @@ class _HomePageState extends State<HomePage> {
 
     var res = await http.get(uri);
     print("resalute" + res.body);
+
+    var new_entries = entries;
+    final List<dynamic> dataList = jsonDecode(res.body);
+    for (var element in dataList) {
+      new_entries.add(element['email']);
+    }
+    setState(() {
+      entries = new_entries;
+    });
+  }
+
+  void contractCall() async {
+    var transactionParameters = {
+      "from": _session.accounts[0],
+      "to": "0xc4eda05ddcdde224f22bf076846440949486a8c6",
+      "data": "0x0",
+    };
+
+    List<dynamic> params = [
+      {
+        "from": transactionParameters["from"],
+        "to": transactionParameters["to"],
+        "data": transactionParameters["data"],
+      }
+    ];
+
+    String method = "eth_sendTransaction";
+
+    print(params);
+
+    await launchUrl(Uri.parse(connector!.session.toUri()),
+        mode: LaunchMode.externalApplication);
+    final signature =
+        await connector.sendCustomRequest(method: method, params: params);
+
+    print(signature);
   }
 
   @override
   void initState() {
     // TODO: implement initState
     // SocketService().connected();
-    const ws_url = "https://b959-159-20-68-5.eu.ngrok.io";
+    const ws_url = "https://b597-159-20-68-5.eu.ngrok.io";
     IO.Socket socket =
         IO.io(ws_url, IO.OptionBuilder().setTransports(["websocket"]).build());
 
@@ -251,6 +283,8 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 10,
               ),
+              ElevatedButton(
+                  onPressed: contractCall, child: const Text('contrat call')),
               const Divider(
                 color: AppColors.textColor2,
                 thickness: 1,
