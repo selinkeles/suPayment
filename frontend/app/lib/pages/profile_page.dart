@@ -18,8 +18,7 @@ import 'package:http/http.dart' as http;
 
 
 class ProfilePage extends StatefulWidget {
-  bool isConnected;
-  ProfilePage({ Key? key, required this.isConnected}) : super(key: key);
+  ProfilePage({ Key? key, }) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -152,9 +151,10 @@ class _ProfilePageState extends State<ProfilePage> {
     await prefs.setBool('isConnected', false);
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => ProfilePage(isConnected: false,)),
+      MaterialPageRoute(builder: (context) => ProfilePage()),
     );
   }
+
 
 
   var isLogin = false;
@@ -164,7 +164,6 @@ class _ProfilePageState extends State<ProfilePage> {
     var width = MediaQuery.of(context).size.width;
     final walletProvider = Provider.of<WalletProvider>(context);
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Scaffold(
        appBar: AppBar(
         centerTitle: true,
@@ -183,32 +182,37 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         ),
         actions: [
-          Center(
-            child: Container(
-              child: AppText(text: "Edit",color: Colors.white70,),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: InkWell(
-              splashColor: AppColors.mainColor,
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const EditPage()),
-                  );
-              },
-              child: Icon(
-                Icons.edit,
-                size: 25,
-                color: Colors.white70,
-              ),
-            ),
-          ),
+          (walletProvider.wallet?.wallet_id != null)?Row(
+            children: [
+              Center(
+                child: Container(
+                  child: AppText(text: "Edit",color: Colors.white70,),
+                )
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: InkWell(
+                    splashColor: AppColors.mainColor,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EditPage()),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.edit,
+                      size: 25,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ),
+            ],
+          ):const SizedBox(height: 0, width: 0,),
+
         ],
       ),
-      body: widget.isConnected?SingleChildScrollView(
+      body: (walletProvider.wallet?.wallet_id != null)?SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -229,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       IconButton(
                         iconSize: 130,
                         onPressed: () {},
-                        icon: const CircleAvatar(
+                        icon: CircleAvatar(
                           radius: 130,
                           backgroundColor: AppColors.starColor,
                           backgroundImage:
@@ -374,7 +378,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               height: height*0.03,
             ),
-            Row(
+            /*Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -395,7 +399,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 )
               ],
-            ),
+            ),*/
             SizedBox(
               height: height*0.1,
             )
@@ -420,7 +424,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () => {loginUsingMetamask(context)},
                 icon: CircleAvatar(
                   radius: 50,
-                  backgroundColor: widget.isConnected?Colors.green:Colors.white,
+                  backgroundColor: (walletProvider.wallet?.wallet_id != null)?Colors.green:Colors.white,
                   backgroundImage: const AssetImage("assets/images/metamask_logo.png"),
                 ),
               ),

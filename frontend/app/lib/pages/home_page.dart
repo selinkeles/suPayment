@@ -59,7 +59,6 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool('connector_connected') ?? false;
   }
-  bool _isConnected = false;
 
 
 
@@ -256,18 +255,10 @@ class _HomePageState extends State<HomePage> {
 
 
     super.initState();
-    _loadConnected();
   }
 
 
 
-  Future<void> _loadConnected() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isConnected = prefs.getBool('isConnected') ?? false;
-    setState(() {
-      _isConnected = isConnected;
-    });
-  }
 
   void doNothing(){
     ;
@@ -295,6 +286,7 @@ class _HomePageState extends State<HomePage> {
             }));
 
     var height = MediaQuery.of(context).size.height;
+    final walletProvider = Provider.of<WalletProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -307,7 +299,7 @@ class _HomePageState extends State<HomePage> {
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfilePage(isConnected: _isConnected,)),
+              MaterialPageRoute(builder: (context) => ProfilePage()),
             );
           },
           icon: const CircleAvatar(
@@ -325,15 +317,15 @@ class _HomePageState extends State<HomePage> {
                 height: 45,
                 width: 45,
                 decoration: BoxDecoration(
-                    color: _isConnected?Colors.green:Colors.white,
+                    color: (walletProvider.wallet?.wallet_id != null)?Colors.green:Colors.white,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(color: AppColors.starColor, width: 1)
                 ),
                 child: IconButton(
-                  onPressed: () => {_isConnected? doNothing():loginUsingMetamask(context)},
+                  onPressed: () => {(walletProvider.wallet?.wallet_id != null)? doNothing():loginUsingMetamask(context)},
                   icon: CircleAvatar(
                     radius: 20,
-                    backgroundColor: _isConnected?Colors.green:Colors.white,
+                    backgroundColor: (walletProvider.wallet?.wallet_id != null)?Colors.green:Colors.white,
                     backgroundImage: const AssetImage("assets/images/metamask_logo.png"),
                   ),
                 ),
