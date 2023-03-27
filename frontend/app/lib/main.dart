@@ -3,6 +3,7 @@ import 'package:app/pages/SUlogin_page.dart';
 import 'package:app/pages/signup_page.dart';
 import 'package:app/pages/home_page.dart';
 import 'package:app/pages/profile_page.dart';
+import 'package:app/pages/edit_page.dart';
 import 'package:app/pages/transaction_pages/main_page.dart';
 import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class _MyAppState extends State<MyApp> {
         MyRoutes.suloginRoute: (context) => const suloginPage(),
         MyRoutes.profileRoute: (context) => ProfilePage(),
         MyRoutes.susignupRoute: (context) => const SignupPage(),
+        MyRoutes.editRoute: (context) => const EditPage(),
       },
       theme: ThemeData(
         // This is the theme of your application.

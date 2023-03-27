@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:app/UI/colors.dart';
 import 'package:app/pages/SUlogin_page.dart';
+import 'package:app/pages/edit_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,6 +15,7 @@ import 'package:walletconnect_dart/walletconnect_dart.dart';
 import '../misc/wallet.dart';
 import '../widgets/app_text.dart';
 import 'package:http/http.dart' as http;
+
 
 class ProfilePage extends StatefulWidget {
   bool isConnected;
@@ -93,6 +96,56 @@ class _ProfilePageState extends State<ProfilePage> {
     "Address C",
     "Address D",
   ];
+
+  
+  @override
+  void initState() {
+    super.initState();
+    // Send GET request when the page is first loaded
+    sendGetRequest();
+  }
+  String _imageUrl = "assets/images/avatar.jpeg";
+  String _name = "Your name..";
+  String walletId = "";
+
+  Future<void> sendGetRequest() async {
+    // Replace the URL with the endpoint you want to hit
+    final String baseUrl = "https://2320-159-20-68-5.eu.ngrok.io/profile";
+    walletId = Provider.of<WalletProvider>(context, listen: false).wallet!.wallet_id;
+
+    Uri url = Uri.parse(baseUrl + "?wallet_id=" + walletId);
+    try {
+      http.Response response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        // Parse the JSON response body into a Map<String, dynamic>
+        Map<String, dynamic> responseBody = json.decode(response.body);
+        print(responseBody);
+        // Extract the "image_url" and "name" values from the response body
+        
+        if(responseBody['image_url'] == null) {
+          _imageUrl = "assets/images/avatar.jpeg";
+        }
+        else {
+          _imageUrl = responseBody['image_url'];
+        }
+        _name = responseBody['name'];
+
+        // Handle successful response
+        print("Image URL: $_imageUrl");
+        print("Name: $_name");
+      } else {
+        // Handle error response
+        print('Request failed with status: ${response.statusCode}.');
+        
+      }
+    }
+    catch (error){
+      _imageUrl = "assets/images/avatar.jpeg";
+      print(error);
+    }
+  }
+
   @override
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -108,22 +161,52 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    final walletProvider = Provider.of<WalletProvider>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
+       appBar: AppBar(
         centerTitle: true,
-        title: AppLargeText(
-          text: "Profile",
-          size: 25,
-          color: Colors.white70,
+        title: Text(
+          "Profile",
+          style: TextStyle(
+            fontSize: 25,
+            color: Colors.white70,
+          ),
         ),
         backgroundColor: AppColors.mainColor,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_sharp),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
+          icon: Icon(Icons.arrow_back_ios_new_sharp),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          Center(
+            child: Container(
+              child: AppText(text: "Edit",color: Colors.white70,),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: InkWell(
+              splashColor: AppColors.mainColor,
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EditPage()),
+                  );
+              },
+              child: Icon(
+                Icons.edit,
+                size: 25,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+        ],
       ),
       body: widget.isConnected?SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -150,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           radius: 130,
                           backgroundColor: AppColors.starColor,
                           backgroundImage:
-                              AssetImage("assets/images/avatar.jpeg"),
+                              AssetImage(_imageUrl),
                         ),
                       )
                     ],
@@ -162,16 +245,20 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(
                         height: 37,
                       ),
-                      AppLargeText(
-                        text: "Name: Mehmed II",
-                        size: 25,
+                      AppText(
+                        text: _name,
+                        size: 20,
+                        color: Colors.black,
                       ),
                       const SizedBox(
                         height: 15,
                       ),
-                      AppText(
-                        text: "ID: abcx00993njfjdkkn007",
-                        color: Colors.black54,
+                      Container(
+                        width: width * .45,
+                        child: AppText(
+                          text: "ID: "+ walletId,
+                          color: Colors.black54,
+                        ),
                       )
                     ],
                   ),
