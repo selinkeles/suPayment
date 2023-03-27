@@ -3,17 +3,31 @@ import 'package:app/pages/SUlogin_page.dart';
 import 'package:app/widgets/app_large_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'dart:convert';
+
+import '../../misc/wallet.dart';
+import 'package:provider/provider.dart';
+
+import 'package:http/http.dart' as http;
+
+
 
 import '../widgets/app_text.dart';
 
 class EditPage extends StatefulWidget {
   const EditPage({Key? key}) : super(key: key);
+  
 
   @override
   State<EditPage> createState() => _EditPageState();
 }
 
 class _EditPageState extends State<EditPage> {
+  File? _imageFile;
+
+
   List entries = [
     "Address A",
     "Address B",
@@ -22,8 +36,22 @@ class _EditPageState extends State<EditPage> {
   ];
 
   var login = false;
+  void _pickImage() async {
+    final imagePicker = ImagePicker();
+    final pickedImage = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = File(pickedImage.path);
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
+    final walletProvider = Provider.of<WalletProvider>(context);
+    final _controller = TextEditingController();
+
+
     final FocusNode _focusNode = FocusNode();
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -64,15 +92,15 @@ class _EditPageState extends State<EditPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       IconButton(
-                        iconSize: 130,
-                        onPressed: () {},
-                        icon: CircleAvatar(
-                          radius: 130,
-                          backgroundColor: AppColors.starColor,
-                          backgroundImage:
-                              const AssetImage("assets/images/avatar.jpeg"),
-                        ),
-                      )
+                      iconSize: 130,
+                      onPressed: _pickImage,
+                      icon: CircleAvatar(
+                        radius: 130,
+                        backgroundColor: AppColors.starColor,
+                        backgroundImage: _imageFile != null ? FileImage(_imageFile!) as ImageProvider<Object> : const AssetImage("assets/images/avatar.jpeg"),
+                      ),
+                    ),
+
                     ],
                   ),
                   Column(
@@ -114,6 +142,7 @@ class _EditPageState extends State<EditPage> {
             Container(
               width: width*.7,
               child: TextField(
+                controller: _controller,
                 focusNode: _focusNode,
                 keyboardType: TextInputType.name,
                 decoration: const InputDecoration(
@@ -121,12 +150,12 @@ class _EditPageState extends State<EditPage> {
                   border: OutlineInputBorder(),
                 ),
                 onTap: () {
-
                   if (_focusNode.hasFocus) {
                     _focusNode.unfocus();
                   }
                 },
               ),
+
             ),
           ]),
         ),
@@ -143,7 +172,21 @@ class _EditPageState extends State<EditPage> {
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 elevation: 3,
                 backgroundColor: AppColors.starColor,
-                onPressed: () {
+                onPressed: () async {
+                  // Get the wallet ID and profile picture URL from the WalletProvider
+                  String walletId = Provider.of<WalletProvider>(context, listen: false).wallet!.wallet_id;
+                  String pictureUrl = _imageFile != null ? _imageFile!.path : "assets/images/avatar.jpeg"; // If no image is selected, set an empty string as the picture URL
+                  String username = _controller.text;
+
+                  // Send the POST request
+                  http.Response response = await linkWallet(pictureUrl , username,  walletId);
+
+                  // Handle the response
+                  if (response.statusCode == 200) {
+                    // The request was successful, do something
+                  } else {
+                    // The request failed, handle the error
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -161,4 +204,19 @@ class _EditPageState extends State<EditPage> {
             ),
     );
   }
+    Future<http.Response> linkWallet(String pictureUrl, String name, String wallet_id) {
+    var url = Uri.parse('https://2320-159-20-68-5.eu.ngrok.io/edit');
+    return http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'wallet_id': wallet_id,
+        'name': name,
+        'picture_url': pictureUrl,
+      }),
+    );
+ }
+
 }

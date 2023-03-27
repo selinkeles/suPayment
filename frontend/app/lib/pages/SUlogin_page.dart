@@ -150,7 +150,7 @@ class _suloginPageState extends State<suloginPage> {
   }
 
   Future<http.Response> linkWallet(String email, String walletId) {
-  var url = Uri.parse('https://6af0-159-20-68-5.eu.ngrok.io/link');
+  var url = Uri.parse('https://2320-159-20-68-5.eu.ngrok.io/link');
   return http.post(
     url,
     headers: <String, String>{
