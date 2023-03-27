@@ -59,6 +59,7 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool('connector_connected') ?? false;
   }
+  bool _isConnected = false;
 
 
 
@@ -168,10 +169,13 @@ class _HomePageState extends State<HomePage> {
           await launchUrlString(uri, mode: LaunchMode.externalApplication);
         });
         listenTx(session.accounts[0]);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isConnected', true);
         setState(() {
           _session = session;
           account = session.accounts[0];
           _setWallet(context, session.accounts[0]);
+
         });
       } catch (exp) {
         // print(exp);
@@ -235,7 +239,6 @@ class _HomePageState extends State<HomePage> {
 
     print(signature);
   }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -251,8 +254,26 @@ class _HomePageState extends State<HomePage> {
       socket.on("notification", (data) => print("notif received: $data"));
     });
 
+
     super.initState();
+    _loadConnected();
   }
+
+
+
+  Future<void> _loadConnected() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isConnected = prefs.getBool('isConnected') ?? false;
+    setState(() {
+      _isConnected = isConnected;
+    });
+  }
+
+  void doNothing(){
+    ;
+  }
+
+
   @override
   Widget build(BuildContext context) {
     connector.on(
@@ -274,7 +295,6 @@ class _HomePageState extends State<HomePage> {
             }));
 
     var height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -287,7 +307,7 @@ class _HomePageState extends State<HomePage> {
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfilePage(isConnected: connector.connected,)),
+              MaterialPageRoute(builder: (context) => ProfilePage(isConnected: _isConnected,)),
             );
           },
           icon: const CircleAvatar(
@@ -305,15 +325,15 @@ class _HomePageState extends State<HomePage> {
                 height: 45,
                 width: 45,
                 decoration: BoxDecoration(
-                    color: connector.connected?Colors.green:Colors.white,
+                    color: _isConnected?Colors.green:Colors.white,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(color: AppColors.starColor, width: 1)
                 ),
                 child: IconButton(
-                  onPressed: () => {loginUsingMetamask(context)},
+                  onPressed: () => {_isConnected? doNothing():loginUsingMetamask(context)},
                   icon: CircleAvatar(
                     radius: 20,
-                    backgroundColor: connector.connected?Colors.green:Colors.white,
+                    backgroundColor: _isConnected?Colors.green:Colors.white,
                     backgroundImage: const AssetImage("assets/images/metamask_logo.png"),
                   ),
                 ),

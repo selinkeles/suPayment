@@ -15,8 +15,8 @@ import '../widgets/app_text.dart';
 import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
-  var isConnected;
-  ProfilePage({this.isConnected, Key? key}) : super(key: key);
+  bool isConnected;
+  ProfilePage({ Key? key, required this.isConnected}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -86,18 +86,30 @@ class _ProfilePageState extends State<ProfilePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool('connector_connected') ?? false;
   }
+
   List entries = [
     "Address A",
     "Address B",
     "Address C",
     "Address D",
   ];
+  @override
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isConnected', false);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage(isConnected: false,)),
+    );
+  }
 
 
-  var login = false;
+  var isLogin = false;
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -113,7 +125,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.pop(context);
             }),
       ),
-      body: (widget.isConnected||connector.connected)?SingleChildScrollView(
+      body: widget.isConnected?SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -273,7 +285,32 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             SizedBox(
-              height: 70,
+              height: height*0.03,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30)
+                  ),
+                  height: height*0.05,
+                  width: width*0.60,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                            (states) => AppColors.buttonBackground,
+                      ),
+                    ),
+                      onPressed: () => {logout()},
+                      child: AppText(text: "Logout from Metamask", color: Colors.white,)
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: height*0.1,
             )
           ]),
         ),
@@ -296,7 +333,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () => {loginUsingMetamask(context)},
                 icon: CircleAvatar(
                   radius: 50,
-                  backgroundColor: connector.connected?Colors.green:Colors.white,
+                  backgroundColor: widget.isConnected?Colors.green:Colors.white,
                   backgroundImage: const AssetImage("assets/images/metamask_logo.png"),
                 ),
               ),
@@ -305,7 +342,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: login == false
+      floatingActionButton: isLogin == false
           ? Container(
               height: 40,
               width: 200,
