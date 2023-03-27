@@ -14,6 +14,7 @@ import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:web3dart/web3dart.dart';
 //import '../misc/webSocket.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../misc/wallet.dart';
@@ -34,6 +35,34 @@ class _HomePageState extends State<HomePage> {
           url: 'https://walletconnect.org',
           icons: []));
 
+  /*@override
+  void initState() {
+    super.initState();
+    _getConnectedValue().then((value) {
+      setState(() {
+        connector = WalletConnect(
+            bridge: 'https://bridge.walletconnect.org',
+            clientMeta: const PeerMeta(
+                name: 'SU Wallet',
+                description: 'An app for a new payment.',
+                url: 'https://walletconnect.org',
+                icons: []
+            ),
+            connected: value // Initialize the connected value from shared preferences
+        );
+      });
+    });
+  }*/
+
+
+  Future<bool> _getConnectedValue() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('connector_connected') ?? false;
+  }
+  bool _isConnected = false;
+
+
+
   var _uri, _session, account, _signature, chainId;
 
   var accountBalance = 0.0;
@@ -53,16 +82,27 @@ class _HomePageState extends State<HomePage> {
             message: message, address: _session.accounts[0], password: "");
         print(signature);
 
+
         setState(() {
           _signature = signature;
+          _saveConnectedValue(true); // Save the value of connector.connected
         });
       } catch (exp) {
         print("Error while signing transaction");
         print(exp);
       }
+    } else {
+      setState(() {
+        _signature = null;
+        _saveConnectedValue(false); // Save the value of connector.connected
+      });
     }
   }
 
+  void _saveConnectedValue(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('connector_connected', value);
+  }
   /*
   Future<String> signMsgWithMetamask(String message) async {
     final client = WCClient();
@@ -129,10 +169,13 @@ class _HomePageState extends State<HomePage> {
           await launchUrlString(uri, mode: LaunchMode.externalApplication);
         });
         listenTx(session.accounts[0]);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isConnected', true);
         setState(() {
           _session = session;
           account = session.accounts[0];
           _setWallet(context, session.accounts[0]);
+
         });
       } catch (exp) {
         // print(exp);
@@ -196,7 +239,6 @@ class _HomePageState extends State<HomePage> {
 
     print(signature);
   }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -212,8 +254,25 @@ class _HomePageState extends State<HomePage> {
       socket.on("notification", (data) => print("notif received: $data"));
     });
 
+
     super.initState();
+    _loadConnected();
   }
+
+
+
+  Future<void> _loadConnected() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isConnected = prefs.getBool('isConnected') ?? false;
+    setState(() {
+      _isConnected = isConnected;
+    });
+  }
+
+  void doNothing(){
+    ;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +295,6 @@ class _HomePageState extends State<HomePage> {
             }));
 
     var height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -245,9 +303,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
+
+
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfilePage()),
+              MaterialPageRoute(builder: (context) => ProfilePage(isConnected: _isConnected,)),
             );
           },
           icon: const CircleAvatar(
@@ -257,10 +317,28 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: <Widget>[
-          IconButton(
-            onPressed: () => {loginUsingMetamask(context)},
-            icon: const Icon(Icons.wallet),
-            iconSize: 100,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                height: 45,
+                width: 45,
+                decoration: BoxDecoration(
+                    color: _isConnected?Colors.green:Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: AppColors.starColor, width: 1)
+                ),
+                child: IconButton(
+                  onPressed: () => {_isConnected? doNothing():loginUsingMetamask(context)},
+                  icon: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: _isConnected?Colors.green:Colors.white,
+                    backgroundImage: const AssetImage("assets/images/metamask_logo.png"),
+                  ),
+                ),
+              ),
+            ],
           ),
           /* IconButton(
             onPressed: () => {getNetworkName(_session.chainId)},
@@ -269,107 +347,109 @@ class _HomePageState extends State<HomePage> {
           ),*/
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                  onPressed: getKnownUsers, child: const Text('get users')),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                  onPressed: contractCall, child: const Text('contrat call')),
-              const Divider(
-                color: AppColors.textColor2,
-                thickness: 1,
-                height: 1,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white,
-                    border: Border.all(color: AppColors.mainColor, width: 2),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppLargeText(
-                            text: "Account Balance",
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                    onPressed: getKnownUsers, child: const Text('get users')),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(
+                    onPressed: contractCall, child: const Text('contrat call')),
+                const Divider(
+                  color: AppColors.textColor2,
+                  thickness: 1,
+                  height: 1,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.mainColor, width: 2),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AppLargeText(
+                              text: "Account Balance",
+                              color: AppColors.bigTextColor,
+                              size: 15),
+                          AppLargeText(
+                            text: "25 ETH",
                             color: AppColors.bigTextColor,
-                            size: 15),
-                        AppLargeText(
-                          text: "25 ETH",
-                          color: AppColors.bigTextColor,
-                          size: 15,
-                        )
-                      ],
+                            size: 15,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Divider(
-                color: AppColors.textColor2,
-                thickness: 1,
-                height: 1,
-              ),
-              const SizedBox(height: 15),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppLargeText(
-                    text: "Recent Transactions",
-                    size: 24,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(8, 5, 8, 0),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.mainColor, width: 3),
-                      borderRadius: BorderRadius.circular(12)),
-                  height: height * .53,
-                  child: ListView.separated(
-                    itemCount: entries.length,
-                    padding: const EdgeInsets.all(2),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                            color: AppColors.buttonBackground,
-                            borderRadius: BorderRadius.circular(10)),
-                        height: 50,
-                        child: Center(
-                            child: AppText(
-                          text: "${entries[index]}",
-                          color: Colors.white,
-                        )),
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const Divider(
-                      height: 7,
+                const SizedBox(height: 15),
+                const Divider(
+                  color: AppColors.textColor2,
+                  thickness: 1,
+                  height: 1,
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppLargeText(
+                      text: "Recent Transactions",
+                      size: 24,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(8, 5, 8, 0),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.mainColor, width: 3),
+                        borderRadius: BorderRadius.circular(12)),
+                    height: entries.length*65,
+                    child: ListView.separated(
+                      itemCount: entries.length,
+                      padding: const EdgeInsets.all(2),
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          decoration: BoxDecoration(
+                              color: AppColors.buttonBackground,
+                              borderRadius: BorderRadius.circular(10)),
+                          height: 50,
+                          child: Center(
+                              child: AppText(
+                            text: "${entries[index]}",
+                            color: Colors.white,
+                          )),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(
+                        height: 7,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
