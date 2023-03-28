@@ -1,21 +1,5 @@
 # SUPayment
 
-##  TODO
-
-- yagiz:
-  - endpoints for server
-  - schema for endpoints
-  - server/index/ > connect.ts'i middleware olarak kullan
-
-- berke:
-  - main page ilk acılcak sayfa
-  - butonlar (pop-up) > request schema bitince requestler eklencek
-  - profil sayfası (connect to sulogin butonu dahil)
-
-- deniz:
-  - event listener > recent transactions sayfası
-  - balance gostergesi > blockchainden alınacak (allowances in contract)
-
 ## Installation
 
 - go into blockchain > 'run npm install'
