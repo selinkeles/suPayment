@@ -4,11 +4,9 @@ import 'package:app/pages/signup_page.dart';
 import 'package:app/pages/home_page.dart';
 import 'package:app/pages/profile_page.dart';
 import 'package:app/pages/edit_page.dart';
-import 'package:app/pages/transaction_pages/main_page.dart';
 import 'package:app/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:app/pages/edit_page.dart';
 
 import 'utils/routes.dart';
 
@@ -37,7 +35,7 @@ class _MyAppState extends State<MyApp> {
       title: 'SU Wallet',
       initialRoute: count == 0 ? MyRoutes.welcomeRoute : MyRoutes.homeRoute,
       routes: {
-        MyRoutes.homeRoute: (context) => HomePage(),
+        MyRoutes.homeRoute: (context) => const HomePage(),
         MyRoutes.welcomeRoute: (context) => const WelcomePage(),
         MyRoutes.suloginRoute: (context) => const suloginPage(),
         MyRoutes.profileRoute: (context) => ProfilePage(),

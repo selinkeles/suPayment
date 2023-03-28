@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:app/utils/constants.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'dart:convert';
 import 'package:app/UI/colors.dart';
 import 'package:app/pages/profile_page.dart';
@@ -11,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../misc/wallet.dart';
 
 import '../misc/metamask_connector.dart';
@@ -34,221 +32,15 @@ class _HomePageState extends State<HomePage> {
   late double accountBalance;
   late Map transactionParameters;
 
-  /*@override
-  void initState() {
-    super.initState();
-    _getConnectedValue().then((value) {
-      setState(() {
-        connector = WalletConnect(
-            bridge: 'https://bridge.walletconnect.org',
-            clientMeta: const PeerMeta(
-                name: 'SU Wallet',
-                description: 'An app for a new payment.',
-                url: 'https://walletconnect.org',
-                icons: []
-            ),
-            connected: value // Initialize the connected value from shared preferences
-        );
-      });
-    });
-  }*/
+  void initializeMetamaskConnector() {
+    metamaskConnector = MetamaskConnector();
+    connector = metamaskConnector.getConnector();
+    userAddress = metamaskConnector.getAccount();
+  }
 
   void initializeServerConnector() {
     serverConnector = ServerConnector(userAddress);
-  }
-
-  var _uri, _session, account, _signature, chainId;
-
-  var accountBalance = 0.0;
-  var _wallet_id;
-
-  signMessageWithMetamask(BuildContext context, String message) async {
-    if (connector.connected) {
-      try {
-        print("Message received");
-        print(message);
-
-        EthereumWalletConnectProvider provider =
-            EthereumWalletConnectProvider(connector);
-        launchUrlString(_uri, mode: LaunchMode.externalApplication);
-
-        var signature = await provider.personalSign(
-            message: message, address: _session.accounts[0], password: "");
-        print(signature);
-
-        setState(() {
-          _signature = signature;
-          _saveConnectedValue(true); // Save the value of connector.connected
-        });
-      } catch (exp) {
-        print("Error while signing transaction");
-        print(exp);
-      }
-      return tx;
-    }
-
-    socket.onConnect((_) {
-      socket.on("tx", (data) => transactions.add(filterTx(data)));
-      socket.on("balance", (data) => accountBalance = data);
-    });
-  }
-
-  void _saveConnectedValue(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('connector_connected', value);
-  }
-  /*
-  Future<String> signMsgWithMetamask(String message) async {
-    final client = WCClient();
-    final response = await client.request({
-      "method": "personal_sign",
-      "params": [message, from],
-      "id": DateTime.now().millisecondsSinceEpoch,
-    });
-    
-    if (response.containsKey("error")) {
-      throw Exception(response["error"]["message"]);
-    }
-    final signature = response["result"] as String;
-    return signature;
-  }
-  */
-
-  var client = WCClient();
-
-  getNetworkName(chainId) {
-    switch (chainId) {
-      case 1:
-        return 'Ethereum Mainnet';
-      case 3:
-        return 'Ropsten Testnet';
-      case 4:
-        return 'Rinkeby Testnet';
-      case 5:
-        return 'Goreli Testnet';
-      case 42:
-        return 'Kovan Testnet';
-      case 137:
-        return 'Polygon Mainnet';
-      case 80001:
-        return 'Mumbai Testnet';
-      default:
-        return 'Unknown Chain';
-    }
-  }
-
-  void listenTx(String address) async {
-    var client = http.Client();
-    try {
-      var response = await client.post(
-        Uri.parse("http://10.0.2.2:3000/subscribe"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{'addr': address}),
-      );
-      var decResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
-      var uri = Uri.parse(decResponse['uri'] as String);
-      print(await client.get(uri));
-    } finally {
-      client.close();
-    }
-  }
-
-  loginUsingMetamask(BuildContext context) async {
-    if (!connector.connected) {
-      try {
-        var session = await connector.createSession(onDisplayUri: (uri) async {
-          _uri = uri;
-          await launchUrlString(uri, mode: LaunchMode.externalApplication);
-        });
-        listenTx(session.accounts[0]);
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('isConnected', true);
-        setState(() {
-          _session = session;
-          account = session.accounts[0];
-          _setWallet(context, session.accounts[0]);
-        });
-      } catch (exp) {
-        // print(exp);
-      }
-    }
-  }
-
-  void _setWallet(BuildContext context, String id) {
-    final walletProvider = Provider.of<WalletProvider>(context, listen: false);
-
-    Wallett wallet = Wallett(
-      wallet_id: id,
-    );
-
-    walletProvider.setWallet(wallet);
-  }
-
-  List entries = ["Transaction A", "Transaction B"];
-
-  void getKnownUsers() async {
-    var url = "https://b959-159-20-68-5.eu.ngrok.io";
-    var endpoint = "/knownusers";
-    var uri = Uri.parse(url + endpoint);
-
-    var res = await http.get(uri);
-    print("resalute" + res.body);
-
-    var new_entries = entries;
-    final List<dynamic> dataList = jsonDecode(res.body);
-    for (var element in dataList) {
-      new_entries.add(element['email']);
-    }
-    setState(() {
-      entries = new_entries;
-    });
-  }
-
-  void contractCall() async {
-    var transactionParameters = {
-      "from": _session.accounts[0],
-      "to": "0xc4eda05ddcdde224f22bf076846440949486a8c6",
-      "data": "0x0",
-    };
-
-    List<dynamic> params = [
-      {
-        "from": transactionParameters["from"],
-        "to": transactionParameters["to"],
-        "data": transactionParameters["data"],
-      }
-    ];
-
-    String method = "eth_sendTransaction";
-
-    print(params);
-
-    await launchUrl(Uri.parse(connector!.session.toUri()),
-        mode: LaunchMode.externalApplication);
-    final signature =
-        await connector.sendCustomRequest(method: method, params: params);
-
-    print(signature);
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    // SocketService().connected();
-    const ws_url = "https://b597-159-20-68-5.eu.ngrok.io";
-    IO.Socket socket =
-        IO.io(ws_url, IO.OptionBuilder().setTransports(["websocket"]).build());
-
-    socket.onConnect((_) {
-      print("connect");
-      socket.emit("client-event", "test");
-      socket.on("server-event", (data) => print("server-event: $data"));
-      socket.on("notification", (data) => print("notif received: $data"));
-    });
-
-    super.initState();
+    socket = serverConnector.getSocket();
   }
 
   void doNothing() {
@@ -269,10 +61,9 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfilePage()),
               MaterialPageRoute(
                   builder: (context) => ProfilePage(
-                        isConnected: connector.connected,
+                        isConnected: metamaskConnector.isConnected(),
                       )),
             );
           },
@@ -300,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () => {
                     (walletProvider.wallet?.wallet_id != null)
                         ? doNothing()
-                        : loginUsingMetamask(context)
+                        : metamaskConnector.loginUsingMetamask()
                   },
                   icon: CircleAvatar(
                     radius: 20,
@@ -406,9 +197,9 @@ class _HomePageState extends State<HomePage> {
                         border:
                             Border.all(color: AppColors.mainColor, width: 3),
                         borderRadius: BorderRadius.circular(12)),
-                    height: entries.length * 65,
+                    height: transactions.length * 65,
                     child: ListView.separated(
-                      itemCount: entries.length,
+                      itemCount: transactions.length,
                       padding: const EdgeInsets.all(2),
                       itemBuilder: (BuildContext context, int index) {
                         return Container(
