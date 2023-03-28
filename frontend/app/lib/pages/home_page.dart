@@ -8,32 +8,31 @@ import 'package:app/widgets/app_large_text.dart';
 import 'package:app/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:wallet_connect/wallet_connect.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:web3dart/web3dart.dart';
-//import '../misc/webSocket.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../misc/wallet.dart';
 
+import '../misc/metamask_connector.dart';
+import '../misc/server_connector.dart';
+
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  var connector = WalletConnect(
-      bridge: 'https://bridge.walletconnect.org',
-      clientMeta: const PeerMeta(
-          name: 'SU Wallet',
-          description: 'An app for a new payment.',
-          url: 'https://walletconnect.org',
-          icons: []));
+  late MetamaskConnector metamaskConnector;
+  late WalletConnect connector;
+  late String userAddress;
+  late ServerConnector serverConnector;
+  late io.Socket socket;
+  late List<String> transactions;
+  late double accountBalance;
+  late Map transactionParameters;
 
   /*@override
   void initState() {
@@ -54,13 +53,9 @@ class _HomePageState extends State<HomePage> {
     });
   }*/
 
-
-  Future<bool> _getConnectedValue() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('connector_connected') ?? false;
+  void initializeServerConnector() {
+    serverConnector = ServerConnector(userAddress);
   }
-
-
 
   var _uri, _session, account, _signature, chainId;
 
@@ -81,7 +76,6 @@ class _HomePageState extends State<HomePage> {
             message: message, address: _session.accounts[0], password: "");
         print(signature);
 
-
         setState(() {
           _signature = signature;
           _saveConnectedValue(true); // Save the value of connector.connected
@@ -90,12 +84,13 @@ class _HomePageState extends State<HomePage> {
         print("Error while signing transaction");
         print(exp);
       }
-    } else {
-      setState(() {
-        _signature = null;
-        _saveConnectedValue(false); // Save the value of connector.connected
-      });
+      return tx;
     }
+
+    socket.onConnect((_) {
+      socket.on("tx", (data) => transactions.add(filterTx(data)));
+      socket.on("balance", (data) => accountBalance = data);
+    });
   }
 
   void _saveConnectedValue(bool value) async {
@@ -174,7 +169,6 @@ class _HomePageState extends State<HomePage> {
           _session = session;
           account = session.accounts[0];
           _setWallet(context, session.accounts[0]);
-
         });
       } catch (exp) {
         // print(exp);
@@ -238,6 +232,7 @@ class _HomePageState extends State<HomePage> {
 
     print(signature);
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -253,38 +248,15 @@ class _HomePageState extends State<HomePage> {
       socket.on("notification", (data) => print("notif received: $data"));
     });
 
-
     super.initState();
   }
 
-
-
-
-  void doNothing(){
+  void doNothing() {
     ;
   }
 
-
   @override
   Widget build(BuildContext context) {
-    connector.on(
-        'connect',
-        (session) => setState(
-              () {
-                _session = _session;
-              },
-            ));
-    connector.on(
-        'session_update',
-        (payload) => setState(() {
-              _session = payload;
-            }));
-    connector.on(
-        'disconnect',
-        (payload) => setState(() {
-              _session = null;
-            }));
-
     var height = MediaQuery.of(context).size.height;
     final walletProvider = Provider.of<WalletProvider>(context);
     return Scaffold(
@@ -295,11 +267,13 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
-
-
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePage()),
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                        isConnected: connector.connected,
+                      )),
             );
           },
           icon: const CircleAvatar(
@@ -317,16 +291,24 @@ class _HomePageState extends State<HomePage> {
                 height: 45,
                 width: 45,
                 decoration: BoxDecoration(
-                    color: (walletProvider.wallet?.wallet_id != null)?Colors.green:Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: AppColors.starColor, width: 1)
-                ),
+                    color: (walletProvider.wallet?.wallet_id != null)
+                        ? Colors.green
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: AppColors.starColor, width: 1)),
                 child: IconButton(
-                  onPressed: () => {(walletProvider.wallet?.wallet_id != null)? doNothing():loginUsingMetamask(context)},
+                  onPressed: () => {
+                    (walletProvider.wallet?.wallet_id != null)
+                        ? doNothing()
+                        : loginUsingMetamask(context)
+                  },
                   icon: CircleAvatar(
                     radius: 20,
-                    backgroundColor: (walletProvider.wallet?.wallet_id != null)?Colors.green:Colors.white,
-                    backgroundImage: const AssetImage("assets/images/metamask_logo.png"),
+                    backgroundColor: (walletProvider.wallet?.wallet_id != null)
+                        ? Colors.green
+                        : Colors.white,
+                    backgroundImage:
+                        const AssetImage("assets/images/metamask_logo.png"),
                   ),
                 ),
               ),
@@ -350,12 +332,19 @@ class _HomePageState extends State<HomePage> {
                   height: 20,
                 ),
                 ElevatedButton(
-                    onPressed: getKnownUsers, child: const Text('get users')),
+                    onPressed: () {
+                      serverConnector.getUsers();
+                    },
+                    child: const Text('get users')),
                 const SizedBox(
                   height: 10,
                 ),
                 ElevatedButton(
-                    onPressed: contractCall, child: const Text('contrat call')),
+                    onPressed: () {
+                      metamaskConnector
+                          .callContractTransfer(transactionParameters);
+                    },
+                    child: const Text('contrat call')),
                 const Divider(
                   color: AppColors.textColor2,
                   thickness: 1,
@@ -414,9 +403,10 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(8, 5, 8, 0),
                     decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.mainColor, width: 3),
+                        border:
+                            Border.all(color: AppColors.mainColor, width: 3),
                         borderRadius: BorderRadius.circular(12)),
-                    height: entries.length*65,
+                    height: entries.length * 65,
                     child: ListView.separated(
                       itemCount: entries.length,
                       padding: const EdgeInsets.all(2),
@@ -428,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                           height: 50,
                           child: Center(
                               child: AppText(
-                            text: "${entries[index]}",
+                            text: transactions[index],
                             color: Colors.white,
                           )),
                         );

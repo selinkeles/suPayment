@@ -1,18 +1,18 @@
+// server packages
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
+// rpc connection
 import { connectToRPC } from "./connectToAlchemy";
-import { WebhookType, Network } from 'alchemy-sdk';
 
+// app settings
+import { AppSettings } from "./appSettings";
+
+// ORM client
 import { PrismaClient, Prisma } from '@prisma/client';
+import { Network } from 'alchemy-sdk';
 const prisma = new PrismaClient()
-
-
-const PORT = 3000;
-
-const webhook_id = "wh_7r2u4rtc7lgwu2y1";
-const server_url = "https://b959-159-20-68-5.eu.ngrok.io";
 
 // Express app  
 const app = express()
@@ -23,28 +23,48 @@ const server = createServer(app);
 const io = new Server(server);
 
 // RPC Connection 
-const { alchemy, wallet, contract } = connectToRPC();
+const { alchemy, wallet, contract } = connectToRPC(Network.MATIC_MUMBAI);
 
 
 // HTTP Endpoints
 app.get(`/`, (req, res) => {
-  res.json({ message: `Hello World!` })
-  console.log("hello world");
-})
+  console.log("call: /");
+  res.status(200).json({ message: `Hello World!` })
+});
 
-// selin oki
+app.get(`/users`, async (req, res) => {
+  console.log("call: /users");
+
+  const all_users = await prisma.user.findMany();
+  console.log("all_users: ", all_users);
+  
+  res.status(200).send( all_users );
+});
+
+app.get('/profile', async (req, res) => {
+  console.log("call: /profile");
+  const { user_address } = req.query;
+  
+  var picture_url, name;
+
+  // dummy
+  picture_url = "dummy";
+  name = "dummy";
+
+  res.json({
+    "wallet_id": user_address,
+    "picture_url": picture_url,
+    "name": name
+  });
+});
+
 app.post(`/link`, async (req, res) => {
-  console.log("oldu");
-  console.log("body: ", req.body);
-
-  const { wallet, email } = req.body;
-  console.log("email: ", email);
-  console.log("addr: ", wallet);
-
+  console.log("call: /link");
+  const { userAddress, email } = req.body;
   const user = await prisma.user.create({
     data: {
       email: email,
-      addr: wallet,
+      addr: userAddress,
     },
   })
   console.log(user);
@@ -52,46 +72,36 @@ app.post(`/link`, async (req, res) => {
   res.json(user);
 });
 
-// deniz oki
-app.post(`/subscribe`, async (req, res) => {
-  console.log("oldu");
-  console.log("body: ", req.body);
 
-  const { address } = req.body;
-  console.log("addr: ", address);
+app.post(`/subscribe`, async (req, res) => {
+  console.log("call: /subscribe");
+  const { userAddres } = req.body;
   
   await alchemy.notify.updateWebhook(
-    webhook_id, {
-    addAddresses: [address]
+    AppSettings.webhook_id, {
+    addAddresses: [userAddres]
   });
 
-  res.json({ message: `your req.body: ${address}` });
-});
-
-// for mail -> addr mapping oki
-app.get(`/knownusers`, async (req, res) => {
-  console.log("knownusers oldu");
-
-  const all_users = await prisma.user.findMany();
-  console.log("all_users: ", all_users);
-  
-  res.send( all_users );
+  res.json({ message: `your req.body: ${userAddres}` });
 });
 
 
-// oki
+app.put('/edit', async (req,res) => {
+  console.log("call: /edit");
+  const { userAddres, image_url, name } = req.body;
+  console.log( userAddres, image_url, name);
+  res.status(200).end();
+});
+
+
+
 app.post("/webhook", (req, res) => {
-  console.log("notification received!");
-  console.log("body: ", req.body);
+  console.log("call: /webhook");
+  console.log("webhook received!");
 
   const { webhookId, id, createdAt, type, event } = req.body;
-  console.log("webhookId: ", webhookId, "id: ", id, "createdAt: ", createdAt, "type: ", type, "event: ", event);
-
   const { network, activity } = event;
-  console.log("network: ", network, "activity: ", activity);
-
-  const {fromAddress, toAddress, value, asset} = activity[0];
-  console.log("fromAddress: ", fromAddress, "toAddress: ", toAddress, "value: ", value, "asset: ", asset);
+  const { fromAddress, toAddress, value, asset} = activity[0];
 
   const notif = {
     "toAddress": toAddress,
@@ -109,7 +119,7 @@ app.post("/webhook", (req, res) => {
 
 
 
-// oki
+// websocket event-listen
 io.on('connection', (socket) => {
   console.log(`client connected`);
 
@@ -122,6 +132,6 @@ io.on('connection', (socket) => {
 
 
 // start the server
-server.listen(PORT, () => {
+server.listen(AppSettings.PORT, () => {
   console.log(`🚀 Server ready at: http://localhost:3000`);
 });

@@ -2,7 +2,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '../.env'});
+dotenv.config();
 const { API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 const config: HardhatUserConfig = {
@@ -16,17 +16,28 @@ const config: HardhatUserConfig = {
       }
     }
   },
+
   // network config
-  defaultNetwork: "goerli",
+  defaultNetwork: "mumbai",
   networks: {
     hardhat: {},
-    goerli: {
+    mumbai: {
       url: `${API_URL}`,
       accounts: [`0x${PRIVATE_KEY}`]
-    }
+    },
   },
+
+  // etherscan
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
+  },
+
+  // paths
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts"
   }
 };
 
