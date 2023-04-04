@@ -17,6 +17,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../misc/entries.dart';
 import '../misc/wallet.dart';
 
 class HomePage extends StatefulWidget {
@@ -192,20 +193,21 @@ class _HomePageState extends State<HomePage> {
   List entries = ["Transaction A", "Transaction B"];
 
   void getKnownUsers() async {
-    var url = "https://b959-159-20-68-5.eu.ngrok.io";
-    var endpoint = "/knownusers";
+    var url = "https://566a-159-20-68-5.eu.ngrok.io";
+    var endpoint = "/users";
     var uri = Uri.parse(url + endpoint);
 
     var res = await http.get(uri);
     print("resalute" + res.body);
-
-    var new_entries = entries;
+    List<dynamic> new_entries = [];
     final List<dynamic> dataList = jsonDecode(res.body);
     for (var element in dataList) {
       new_entries.add(element['email']);
     }
+    print(new_entries);
+    Provider.of<Entries>(context, listen: false).setNewEntries(new_entries);
     setState(() {
-      entries = new_entries;
+      new_entries = new_entries;
     });
   }
 
@@ -239,7 +241,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     // SocketService().connected();
-    const ws_url = "https://b597-159-20-68-5.eu.ngrok.io";
+    const ws_url = "https://566a-159-20-68-5.eu.ngrok.io";
     IO.Socket socket =
         IO.io(ws_url, IO.OptionBuilder().setTransports(["websocket"]).build());
 
@@ -285,6 +287,7 @@ class _HomePageState extends State<HomePage> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final walletProvider = Provider.of<WalletProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -348,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                   height: 20,
                 ),
                 ElevatedButton(
-                    onPressed: getKnownUsers, child: const Text('get users')),
+                    onPressed: () => getKnownUsers(), child: const Text('get users')),
                 const SizedBox(
                   height: 10,
                 ),

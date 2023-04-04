@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import '../../misc/entries.dart';
+import '../../misc/searchbar.dart';
 import '../../misc/wallet.dart';
 
 class TransferPage extends StatefulWidget {
@@ -34,7 +36,7 @@ class _TransferPageState extends State<TransferPage> {
   @override
   Widget build(BuildContext context) {
     final walletProvider = Provider.of<WalletProvider>(context);
-
+    /*List<dynamic> entries = Provider.of<Entries>(context).newEntries;*/
     if (walletProvider.wallet != null) {
       Wallett wallet = walletProvider.wallet!;
     }
@@ -191,6 +193,7 @@ class _TransferPageState extends State<TransferPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          /*SearchBar(userList: entries.map((item) => item.toString()).toList(),),*/
                           AppText(
                             text: 'Scan the QR code for making a transaction',
                             color: Colors.black54,

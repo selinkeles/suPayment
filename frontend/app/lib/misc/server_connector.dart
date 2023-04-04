@@ -4,7 +4,7 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class ServerConnector {
   final httpClient = http.Client();
-  final url = "https://2320-159-20-68-5.eu.ngrok.io";
+  final url = "https://566a-159-20-68-5.eu.ngrok.io";
   late String endpoint;
   late Uri uri;
   late String userAddress;
@@ -37,6 +37,10 @@ class ServerConnector {
     uri = Uri.parse(url + endpoint);
     final response = await httpClient.get(uri);
     final List<dynamic> dataList = jsonDecode(response.body);
+    List<String> new_entries = [];
+    for (var element in dataList) {
+      new_entries.add(element['email']);
+    }
     return dataList;
   }
 
