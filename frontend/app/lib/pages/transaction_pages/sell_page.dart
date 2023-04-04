@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../UI/colors.dart';
+import '../../misc/wallet.dart';
 import '../../widgets/app_large_text.dart';
 import '../../widgets/app_text.dart';
 
@@ -18,6 +20,7 @@ class _SellPageState extends State<SellPage> {
   TextEditingController _amountController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final walletProvider = Provider.of<WalletProvider>(context);
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
@@ -75,7 +78,7 @@ class _SellPageState extends State<SellPage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6.0),
-            child: Row(
+            child: (walletProvider.wallet?.wallet_id != null)?Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AppLargeText(
@@ -87,6 +90,14 @@ class _SellPageState extends State<SellPage> {
                   color: AppColors.bigTextColor,
                   size: 15,
                 )
+              ],
+            ): Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppLargeText(
+                    text: "Connect Metamask to see your account balance.",
+                    color: AppColors.bigTextColor,
+                    size: 15),
               ],
             ),
           ),
@@ -115,18 +126,31 @@ class _SellPageState extends State<SellPage> {
           elevation: 3,
           backgroundColor: AppColors.buttonBackground,
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: AppText(
-                text: "Your transaction has successfully sent!",
-                color: Colors.white,
-              ),
-              duration: const Duration(seconds: 1),
-            ));
+            if (walletProvider.wallet?.wallet_id != null){
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: AppText(
+                  text: "Your transaction has successfully sent!",
+                  color: Colors.white,
+                ),
+                duration: const Duration(seconds: 2),
+              ));
+            }
+            else{
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: AppText(
+                  text: "Transaction failed! Check your Metamask connection.",
+                  color: Colors.white,
+                ),
+                duration: const Duration(seconds: 2),
+              ));
+
+            }
+
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: AppText(
-              text: "Send Buy Order",
+              text: "Send Sell Order",
               size: 15,
               color: Colors.white,
             ),

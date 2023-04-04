@@ -168,13 +168,10 @@ class _HomePageState extends State<HomePage> {
           await launchUrlString(uri, mode: LaunchMode.externalApplication);
         });
         listenTx(session.accounts[0]);
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('isConnected', true);
         setState(() {
           _session = session;
           account = session.accounts[0];
           _setWallet(context, session.accounts[0]);
-
         });
       } catch (exp) {
         // print(exp);
@@ -286,6 +283,7 @@ class _HomePageState extends State<HomePage> {
             }));
 
     var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     final walletProvider = Provider.of<WalletProvider>(context);
     return Scaffold(
       appBar: AppBar(
@@ -355,7 +353,7 @@ class _HomePageState extends State<HomePage> {
                   height: 10,
                 ),
                 ElevatedButton(
-                    onPressed: contractCall, child: const Text('contrat call')),
+                    onPressed: () => contractCall(), child: const Text('contrat call')),
                 const Divider(
                   color: AppColors.textColor2,
                   thickness: 1,
@@ -375,7 +373,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                      child: Row(
+                      child: (walletProvider.wallet?.wallet_id != null)?
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           AppLargeText(
@@ -388,7 +387,17 @@ class _HomePageState extends State<HomePage> {
                             size: 15,
                           )
                         ],
-                      ),
+                      ):
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AppLargeText(
+                              text: "Connect Metamask to see your account balance.",
+                              color: AppColors.bigTextColor,
+                              size: 14),
+                        ],
+                      )
+                      ,
                     ),
                   ),
                 ),
@@ -411,7 +420,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 15),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Container(
+                  child: (walletProvider.wallet?.wallet_id != null)?Container(
                     padding: const EdgeInsets.fromLTRB(8, 5, 8, 0),
                     decoration: BoxDecoration(
                         border: Border.all(color: AppColors.mainColor, width: 3),
@@ -438,8 +447,8 @@ class _HomePageState extends State<HomePage> {
                         height: 7,
                       ),
                     ),
+                  ) :AppText(text: "Please login to Metamask to see your recent transactions.")
                   ),
-                ),
               ],
             ),
           ),
